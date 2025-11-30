@@ -6,20 +6,26 @@ metadata:
 data:
   CART_ENDPOINT: "cart:8080"
   DB_HOST: "mysql"
-  RABBITMQ_HOST: "rabbitmq"
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: shipping
   namespace: roboshop
+  # these are replica set labels
+  labels:
+    project: roboshop
+    component: shipping
+    tier: backend
 spec:
   replicas: 1
   selector:
+    # these labels are used to select pods
     matchLabels:
       project: roboshop
       component: shipping
       tier: backend
+  # pod definition
   template:
     metadata:
       labels:
@@ -34,11 +40,6 @@ spec:
         envFrom:
         - configMapRef:
             name: shipping
-        env:
-        - name: RABBITMQ_USER
-          value: "roboshop"
-        - name: RABBITMQ_PASS
-          value: "roboshop123"
         ports:
         - name: liveness-port
           containerPort: 8080
@@ -67,5 +68,5 @@ spec:
     tier: backend
   ports:
     - protocol: TCP
-      port: 8080
-      targetPort: 8080
+      port: 8080 # service port
+      targetPort: 8080 # container port
